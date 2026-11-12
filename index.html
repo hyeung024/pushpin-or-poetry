@@ -1,0 +1,752 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<title>Pushpin or Poetry</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,500;0,6..96,700;1,6..96,500;1,6..96,700&family=Public+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+/* Layout: an 1850 pamphlet duel. Bastiat (French ultramarine) on the left, Mill (English green) on the right; the game table sits between them like a printer's proof. */
+:root{
+  --bg:#eef0f4; --paper:#fbfcfd; --rule:#c9cedb; --rule-soft:#dfe3ec; --ink:#191d2e; --ink-soft:#585f75;
+  --bastiat:#2a46a8; --bastiat-bg:#2a46a812; --mill:#1d6a50; --mill-bg:#1d6a5014;
+  --hunt:#8c2f45; --hunt-bg:#8c2f4512; --gold:#a2780f; --gold-bg:#a2780f18;
+  --good:#1d7a42; --bad:#b4372b;
+  --d-bastiat:var(--bastiat); --d-mill:var(--mill); --d-hunt:var(--hunt); --d-who:#6b4aa0; --d-ctx:#8a5a14;
+  --display:"Bodoni Moda", "Didot", "Bodoni 72", Georgia, serif;
+  --ui:"Public Sans", "Segoe UI", system-ui, sans-serif;
+  --mono:"JetBrains Mono", ui-monospace, Consolas, monospace;
+  --shadow:0 12px 30px -20px #191d2e99;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#12141c; --paper:#1a1d28; --rule:#343a4d; --rule-soft:#262b3a; --ink:#e6e8f0; --ink-soft:#9aa1b8;
+  --bastiat:#8aa2ff; --bastiat-bg:#8aa2ff1c; --mill:#5fcb9f; --mill-bg:#5fcb9f1c;
+  --hunt:#f08aa2; --hunt-bg:#f08aa21c; --gold:#e3b84a; --gold-bg:#e3b84a22;
+  --good:#5fd08a; --bad:#ff8a7a; --d-who:#b89cf0; --d-ctx:#e0a75a;
+  --shadow:0 12px 30px -20px #000; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#12141c; --paper:#1a1d28; --rule:#343a4d; --rule-soft:#262b3a; --ink:#e6e8f0; --ink-soft:#9aa1b8;
+  --bastiat:#8aa2ff; --bastiat-bg:#8aa2ff1c; --mill:#5fcb9f; --mill-bg:#5fcb9f1c;
+  --hunt:#f08aa2; --hunt-bg:#f08aa21c; --gold:#e3b84a; --gold-bg:#e3b84a22;
+  --good:#5fd08a; --bad:#ff8a7a; --d-who:#b89cf0; --d-ctx:#e0a75a;
+  --shadow:0 12px 30px -20px #000; color-scheme:dark}
+
+*{box-sizing:border-box}
+html,body{background:var(--bg)}
+body{color:var(--ink);font:400 16px/1.55 var(--ui);-webkit-font-smoothing:antialiased}
+.wrap{max-width:1080px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 64px}
+h1,h2,h3{font-family:var(--display);font-weight:700;text-wrap:balance;margin:0;line-height:1.1}
+h2{font-size:clamp(1.6rem,3.4vw,2.2rem)}
+h3{font-size:1.25rem}
+p{margin:0}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--gold);outline-offset:2px;border-radius:4px}
+.eyebrow{font:600 .72rem/1 var(--ui);letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft)}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+
+/* Header + tabs */
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);border-bottom:1px solid var(--rule)}
+header.top .wrap{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-block:12px;flex-wrap:wrap}
+.brand{font-family:var(--display);font-size:1.35rem;font-weight:700;letter-spacing:-.01em}
+.brand i{color:var(--gold);font-weight:500}
+nav.tabs{display:flex;gap:4px;background:var(--paper);border:1px solid var(--rule);border-radius:999px;padding:4px}
+nav.tabs button{border:0;background:none;padding:7px 16px;border-radius:999px;font-weight:600;font-size:.9rem;color:var(--ink-soft)}
+nav.tabs button[aria-selected="true"]{background:var(--ink);color:var(--bg)}
+
+/* Hero */
+.hero{display:grid;grid-template-columns:1fr auto 1fr;align-items:end;gap:20px;padding-block:44px 28px;border-bottom:1px solid var(--rule)}
+.hero .side{display:flex;flex-direction:column;gap:8px;min-width:0}
+.hero .side.r{text-align:right;align-items:flex-end}
+.hero .name{font-family:var(--display);font-style:italic;font-weight:700;font-size:clamp(2.6rem,8vw,5.4rem);line-height:.9;letter-spacing:-.02em}
+.hero .l .name{color:var(--bastiat)} .hero .r .name{color:var(--mill)}
+.hero .tag{font-size:.95rem;color:var(--ink-soft);max-width:30ch}
+.hero .vs{font-family:var(--display);font-size:1.4rem;color:var(--gold);padding-bottom:14px}
+.thesis{padding-block:28px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px}
+.thesis p{font-size:.97rem}
+.thesis b{font-family:var(--display);font-size:1.05rem}
+
+/* Study sections */
+.sec{padding-block:36px;border-bottom:1px solid var(--rule);display:grid;gap:20px}
+.sec > header{display:grid;gap:8px;max-width:68ch}
+.sec > header p{color:var(--ink-soft)}
+.two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}
+.card{background:var(--paper);border:1px solid var(--rule);border-radius:10px;padding:20px;display:grid;gap:12px;align-content:start;min-width:0}
+.card.b{border-top:4px solid var(--bastiat)} .card.m{border-top:4px solid var(--mill)} .card.h{border-top:4px solid var(--hunt)}
+.card ul{margin:0;padding-left:1.1em;display:grid;gap:7px}
+.card li{font-size:.95rem}
+.card h3 small{display:block;font:500 .78rem var(--ui);color:var(--ink-soft);margin-top:4px;letter-spacing:.02em}
+.quote{font-family:var(--display);font-style:italic;font-size:1.1rem;line-height:1.35;border-left:3px solid var(--gold);padding-left:12px}
+.syll{font-family:var(--mono);font-size:.85rem;background:var(--gold-bg);border-radius:8px;padding:12px 14px;display:grid;gap:4px}
+.syll span:last-child{font-weight:700}
+.tbl{overflow-x:auto;border:1px solid var(--rule);border-radius:10px;background:var(--paper)}
+table{border-collapse:collapse;width:100%;min-width:620px;font-size:.92rem}
+th,td{text-align:left;padding:10px 14px;border-bottom:1px solid var(--rule-soft);vertical-align:top}
+thead th{font:600 .72rem var(--ui);letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft)}
+thead th:nth-child(2){color:var(--bastiat)} thead th:nth-child(3){color:var(--mill)}
+tbody th{font-weight:600;white-space:nowrap}
+tr:last-child td,tr:last-child th{border-bottom:0}
+.who-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.who{border:1px solid var(--rule);border-radius:10px;padding:14px;background:var(--paper);display:grid;gap:6px;align-content:start}
+.who b{font-family:var(--display);font-size:1.05rem}
+.who span{font-size:.88rem;color:var(--ink-soft)}
+
+/* Lab */
+.lab{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:24px;background:var(--paper);border:1px solid var(--rule);border-radius:12px;padding:22px}
+.ctrl{display:grid;gap:16px;align-content:start}
+.ctrl label{display:grid;gap:6px;font-size:.9rem;font-weight:600}
+.ctrl label span{display:flex;justify-content:space-between;gap:8px}
+.ctrl output{font-family:var(--mono);color:var(--gold)}
+input[type=range]{width:100%;accent-color:var(--gold)}
+.bars{display:grid;gap:14px;align-content:start}
+.barrow{display:grid;grid-template-columns:62px minmax(0,1fr);gap:10px;align-items:center;font-size:.85rem}
+.bar{display:flex;height:34px;border-radius:6px;overflow:hidden;border:1px solid var(--rule)}
+.bar div{display:flex;align-items:center;padding:0 8px;font:600 .78rem var(--mono);white-space:nowrap;overflow:hidden;transition:width .4s}
+.bar .k{background:var(--bastiat);color:var(--paper)} .bar .w{background:var(--mill);color:var(--paper)}
+.verdict{border-radius:8px;padding:12px 14px;font-size:.92rem}
+.verdict.ok{background:var(--mill-bg)} .verdict.no{background:var(--hunt-bg)}
+.verdict b{font-family:var(--display);font-size:1.05rem}
+
+/* Flashcards */
+.fc-tools{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.chip{border:1px solid var(--rule);background:var(--paper);border-radius:999px;padding:6px 14px;font-size:.85rem;font-weight:600}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.flash{perspective:1200px;max-width:620px;width:100%;margin:0 auto;height:280px}
+.flash .inner{position:relative;width:100%;height:100%;transition:transform .5s;transform-style:preserve-3d;cursor:pointer}
+.flash.flipped .inner{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;backface-visibility:hidden;border-radius:14px;border:1px solid var(--rule);background:var(--paper);box-shadow:var(--shadow);display:grid;place-items:center;text-align:center;padding:28px;gap:10px;align-content:center}
+.face.back{transform:rotateY(180deg)}
+.face .term{font-family:var(--display);font-size:clamp(1.6rem,4vw,2.3rem);font-weight:700}
+.face .def{font-size:1.02rem;max-width:46ch}
+.face .eyebrow{position:absolute;top:16px;left:20px}
+.fc-nav{display:flex;justify-content:center;gap:10px;align-items:center;flex-wrap:wrap}
+.btn{border:1px solid var(--rule);background:var(--paper);padding:10px 18px;border-radius:8px;font-weight:600;font-size:.92rem}
+.btn.primary{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.btn.gold{background:var(--gold);color:#fff;border-color:var(--gold)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+
+/* Play */
+.play{display:grid;grid-template-columns:260px minmax(0,1fr);gap:22px;padding-top:28px;align-items:start}
+.ledger{background:var(--paper);border:1px solid var(--rule);border-radius:12px;overflow:hidden;position:sticky;top:calc(env(safe-area-inset-top,0px) + 80px)}
+.ledger h3{font-size:1.05rem;padding:14px 16px;border-bottom:1px solid var(--rule)}
+.prow{display:grid;grid-template-columns:12px minmax(0,1fr) auto;gap:10px;align-items:center;padding:12px 16px;border-bottom:1px solid var(--rule-soft)}
+.prow:last-child{border-bottom:0}
+.prow.now{background:var(--gold-bg)}
+.dot{width:12px;height:12px;border-radius:50%}
+.prow .nm{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.prow .nm small{display:block;font-weight:500;color:var(--ink-soft);font-size:.75rem}
+.prow .sc{font:700 1.05rem var(--mono)}
+.ledger .meta{padding:12px 16px;border-top:1px solid var(--rule);font-size:.82rem;color:var(--ink-soft);display:grid;gap:4px}
+.table{display:grid;gap:18px;min-width:0}
+.panel{background:var(--paper);border:1px solid var(--rule);border-radius:12px;padding:24px;display:grid;gap:16px}
+.setup-rows{display:grid;gap:10px}
+.setup-row{display:grid;grid-template-columns:14px minmax(0,1fr);gap:10px;align-items:center}
+.setup-row input{width:100%;border:1px solid var(--rule);background:var(--bg);color:var(--ink);border-radius:8px;padding:10px 12px;font:inherit}
+.seg{display:flex;gap:6px;flex-wrap:wrap}
+.rules{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.rule{border:1px dashed var(--rule);border-radius:10px;padding:14px;display:grid;gap:6px;font-size:.88rem}
+.rule b{font-family:var(--display);font-size:1.05rem}
+.decks{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px}
+.deck{border:1px solid var(--rule);border-left:6px solid var(--c);background:var(--paper);border-radius:10px;padding:14px 16px;text-align:left;display:grid;gap:4px;transition:transform .15s,box-shadow .15s}
+.deck:hover:not(:disabled){transform:translateY(-2px);box-shadow:var(--shadow)}
+.deck b{font-family:var(--display);font-size:1.1rem;color:var(--c)}
+.deck span{font-size:.82rem;color:var(--ink-soft)}
+.deck small{font:500 .72rem var(--mono);color:var(--ink-soft)}
+.wager{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.wager button{border:1px solid var(--rule);background:var(--paper);border-radius:12px;padding:18px;text-align:left;display:grid;gap:6px}
+.wager button:hover{box-shadow:var(--shadow)}
+.wager b{font-family:var(--display);font-size:1.5rem;font-style:italic}
+.wager .pts{font:700 .9rem var(--mono);color:var(--gold)}
+.wager span{font-size:.85rem;color:var(--ink-soft)}
+.qhead{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center}
+.pill{font:600 .72rem var(--ui);letter-spacing:.08em;text-transform:uppercase;padding:5px 10px;border-radius:999px;background:color-mix(in srgb,var(--c) 14%,transparent);color:var(--c)}
+.qtext{font-family:var(--display);font-size:clamp(1.25rem,2.6vw,1.6rem);line-height:1.3;font-weight:500}
+.opts{display:grid;gap:10px}
+.opt{border:1px solid var(--rule);background:var(--bg);border-radius:10px;padding:13px 16px;text-align:left;display:grid;grid-template-columns:28px minmax(0,1fr);gap:10px;align-items:start;font-size:.97rem}
+.opt:hover:not(:disabled){border-color:var(--ink-soft)}
+.opt .k{font:700 .85rem var(--mono);color:var(--ink-soft);padding-top:2px}
+.opt.right{border-color:var(--good);background:color-mix(in srgb,var(--good) 12%,transparent)}
+.opt.wrong{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 12%,transparent)}
+.opt:disabled{cursor:default}
+.why{border-radius:10px;padding:14px 16px;background:var(--gold-bg);display:grid;gap:6px;font-size:.95rem}
+.why b{font-family:var(--display);font-size:1.1rem}
+.why.no b{color:var(--bad)} .why.yes b{color:var(--good)}
+.event{border-radius:12px;padding:20px;border:2px solid var(--hunt);background:var(--hunt-bg);display:grid;gap:8px}
+.event b{font-family:var(--display);font-size:1.4rem;color:var(--hunt)}
+.podium{display:grid;gap:10px}
+.podium .prow{border:1px solid var(--rule);border-radius:10px}
+.missed{display:grid;gap:10px}
+.missed div{border-left:3px solid var(--bad);padding:6px 12px;font-size:.9rem}
+.missed div em{display:block;color:var(--ink-soft);font-style:normal;font-size:.85rem}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%) translateY(140%);background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:999px;font-weight:600;font-size:.9rem;transition:transform .3s;z-index:20}
+.toast.show{transform:translateX(-50%) translateY(0)}
+.foot{padding-top:28px;font-size:.82rem;color:var(--ink-soft)}
+
+@media (max-width:820px){
+  .play{grid-template-columns:1fr}
+  .ledger{position:static}
+  .who-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .rules{grid-template-columns:1fr}
+  .lab{grid-template-columns:1fr}
+}
+@media (max-width:640px){
+  .hero{grid-template-columns:1fr;gap:10px;padding-block:28px 20px}
+  .hero .side.r{text-align:left;align-items:flex-start}
+  .hero .vs{padding:0}
+  .thesis,.two{grid-template-columns:1fr}
+  .wager{grid-template-columns:1fr}
+  .flash{height:320px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<header class="top">
+  <div class="wrap">
+    <div class="brand">Pushpin <i>or</i> Poetry</div>
+    <nav class="tabs" role="tablist">
+      <button role="tab" id="tab-study" aria-selected="true" data-view="study">Study</button>
+      <button role="tab" id="tab-cards" aria-selected="false" data-view="cards">Flashcards</button>
+      <button role="tab" id="tab-play" aria-selected="false" data-view="play">Play</button>
+    </nav>
+  </div>
+</header>
+
+<!-- STUDY -->
+<main id="view-study" class="wrap">
+  <section class="hero">
+    <div class="side l">
+      <span class="eyebrow">Pure utilitarian · 1850</span>
+      <div class="name">Bastiat</div>
+      <p class="tag"><i>Economic Harmonies.</i> Every exchange helps both sides, so free markets make every class's interests agree.</p>
+    </div>
+    <div class="vs">vs.</div>
+    <div class="side r">
+      <span class="eyebrow">Eclectic utilitarian · 1848</span>
+      <div class="name">Mill</div>
+      <p class="tag"><i>Principles of Political Economy.</i> Distribution is a human choice, so society can and should reform it.</p>
+    </div>
+  </section>
+
+  <section class="thesis">
+    <p><b>The setting.</b> By the 1840s socialist ideas built on Ricardo's labor theory were spreading fast, especially in France. Conservatives wanted an economics built on pure utility.</p>
+    <p><b>The pure answer.</b> Bastiat pushed Bentham's pleasure principle to its logical end: economics <i>is</i> exchange, and exchange is always harmony.</p>
+    <p><b>The eclectic answer.</b> Mill claimed both Bentham and Ricardo, then qualified each so much that, Hunt says, he ended up being neither.</p>
+  </section>
+
+  <section class="sec">
+    <header>
+      <span class="eyebrow">Frédéric Bastiat (1801–1850)</span>
+      <h2>"Exchange is political economy"</h2>
+      <p>Hunt, ch. 8, pp. 176–185</p>
+    </header>
+    <div class="two">
+      <div class="card b">
+        <h3>His theory<small>What Bastiat argued</small></h3>
+        <ul>
+          <li><b>Science and God.</b> Economics observes like astronomy; socialism imagines like astrology. Laissez-faire is God's order.</li>
+          <li><b>Two gains.</b> Any exchange that happens proves both sides gained.</li>
+          <li><b>Gratuitous vs. onerous utility.</b> Nature's free gifts (water) are never priced. Utility that takes effort (diamonds) is.</li>
+          <li><b>Service = pain.</b> Productive effort by one person to satisfy another's want. Labor is just one kind; landlords and capitalists serve too.</li>
+          <li><b>Property is natural.</b> "Laws exist because there is property." Capital comes from foresight, intelligence, and thrift.</li>
+          <li><b>Rent</b> pays only for the landlord's improvements. <b>Inheritance</b> is sacred because fathers love their children.</li>
+          <li><b>Government</b> should only protect liberty, property, and individual rights. The answer to every social ill: <b>freedom</b>.</li>
+        </ul>
+        <div class="syll">
+          <span>All exchanges benefit all parties.</span>
+          <span>All human interactions are exchanges.</span>
+          <span>∴ All interactions benefit all parties.</span>
+        </div>
+      </div>
+      <div class="card h">
+        <h3>Hunt's critique<small>Where Hunt says it breaks</small></h3>
+        <ul>
+          <li><b>Pain that isn't pain.</b> Service is defined as suffering, yet lending money or letting land be used counts as service. Hunt: inconsistencies expose class bias.</li>
+          <li><b>Invented history.</b> Workers earn subsistence and can't save millions. Real fortunes came from fraud, coercion, and conquest, then inheritance.</li>
+          <li><b>Love, not self-interest.</b> His inheritance defense abandons his own self-interest premise.</li>
+          <li><b>Who drains the fields?</b> Peasants and wage workers did the improving, then paid rent to absentee landlords.</li>
+          <li><b>The ignored exchange.</b> Capitalists trade bribes to politicians for monopoly laws. Both sides gain; the public loses.</li>
+          <li><b>Rate ≠ share.</b> A falling profit <i>rate</i> doesn't mean a falling profit <i>share</i>. Try it in the lab below.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec">
+    <header>
+      <span class="eyebrow">Interactive lab</span>
+      <h2>Test Bastiat's distribution "law"</h2>
+      <p>Bastiat said that as capital piles up, the interest rate falls, so capital's share of output shrinks and labor's grows. Hunt says that only holds if output grows fast enough. We start with capital of 300 earning 10% on output of 100, so capital gets 30 and labor 70. Move the sliders.</p>
+    </header>
+    <div class="lab">
+      <div class="ctrl">
+        <label for="lab-k"><span>Capital grows by <output id="o-k">100%</output></span><input type="range" id="lab-k" min="0" max="200" step="10" value="100"></label>
+        <label for="lab-r"><span>Profit rate falls to <output id="o-r">8%</output></span><input type="range" id="lab-r" min="2" max="10" step="0.5" value="8"></label>
+        <label for="lab-y"><span>Output grows by <output id="o-y">50%</output></span><input type="range" id="lab-y" min="0" max="200" step="10" value="50"></label>
+        <p style="font-size:.82rem;color:var(--ink-soft)">Profit = capital × rate. Wages = output − profit. Example numbers for illustration; they are not in the book.</p>
+      </div>
+      <div class="bars">
+        <div class="barrow"><span class="mono">Before</span><div class="bar" id="bar-a"></div></div>
+        <div class="barrow"><span class="mono">After</span><div class="bar" id="bar-b"></div></div>
+        <div class="verdict" id="verdict"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec">
+    <header>
+      <span class="eyebrow">John Stuart Mill (1806–1873)</span>
+      <h2>"Better to be a Socrates dissatisfied than a fool satisfied"</h2>
+      <p>Hunt, ch. 8, pp. 185–200</p>
+    </header>
+    <div class="two">
+      <div class="card m">
+        <h3>Breaking with Bentham<small>Mill's philosophy and value theory</small></h3>
+        <ul>
+          <li><b>Production vs. distribution.</b> Production follows nature's laws. Distribution is "partly of human institution" and can change.</li>
+          <li><b>Property</b> is a human convention, judged by "general expediency." Exchange is just machinery, like roads and carriages.</li>
+          <li><b>Two axioms rejected.</b> Not all motives are self-interest, and some pleasures are higher than others (poetry beats pushpin).</li>
+          <li><b>Value.</b> Starts near Ricardo's labor theory, then slides back to Smith's adding-up cost of production: wages + profit + rent.</li>
+          <li><b>Profit</b> is both labor's surplus <i>and</i> Senior's "remuneration of abstinence," plus risk and supervision.</li>
+          <li><b>Offer curves.</b> His original trade theory: international prices settle where two countries' offer curves cross.</li>
+        </ul>
+      </div>
+      <div class="card m">
+        <h3>Wages, crises, socialism<small>Mill the reformer</small></h3>
+        <ul>
+          <li><b>Wages fund.</b> Accepted it in 1848; <b>recanted in 1869</b>. Wages are set by struggle, limited by profits minus capitalists' living costs.</li>
+          <li><b>Falling profit rate</b> is offset by exporting capital (like Marx and Lenin later) and by crises that destroy capital.</li>
+          <li><b>Say's Law.</b> Described boom-and-bust clearly, yet still defended Say's Law by calling a glut an "undersupply of money."</li>
+          <li><b>Socialism</b> is morally better than his era's capitalism, but workable only by "the elite of mankind" for now.</li>
+          <li><b>Reforms:</b> national education, union rights, child labor and hours limits, inheritance caps, regulating natural monopolies, poor relief on the 1834 principle.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="card h">
+      <h3>Hunt's critique of Mill<small>Humane, but inconsistent</small></h3>
+      <ul>
+        <li><b>Eclectic.</b> His profit theory swings between Ricardo (profit from production) and Senior (profit from exchange).</li>
+        <li><b>Surplus-capital puzzle.</b> If spare capital can fund reforms for a whole generation, why is profit needed to reward abstinence?</li>
+        <li><b>Why utilitarianism can't reform.</b> It needs unanimity (one misanthrope breaks it), and self-interested politicians will sell laws to the rich.</li>
+        <li><b>Improbable, not impossible.</b> Because Mill dropped utilitarianism he could hope for a public-spirited politician. But in capitalism money is power.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="sec">
+    <header>
+      <span class="eyebrow">Side by side</span>
+      <h2>Harmony or reform</h2>
+    </header>
+    <div class="tbl">
+      <table>
+        <thead><tr><th>Topic</th><th>Bastiat (pure)</th><th>Mill (eclectic)</th></tr></thead>
+        <tbody>
+          <tr><th>Core of economics</th><td>Exchange</td><td>Production and distribution</td></tr>
+          <tr><th>Private property</th><td>Natural, God-given</td><td>Human convention, judged by expediency</td></tr>
+          <tr><th>Origin of fortunes</th><td>Thrift and foresight</td><td>"Conquest and violence"</td></tr>
+          <tr><th>Value</th><td>Utility of services</td><td>Adding-up cost of production</td></tr>
+          <tr><th>Profit</th><td>Reward for capitalist's pain</td><td>Labor surplus and abstinence (inconsistent)</td></tr>
+          <tr><th>Pleasures</th><td>All self-interest</td><td>Some are higher</td></tr>
+          <tr><th>Classes</th><td>Harmony</td><td>Two hereditary classes can't last</td></tr>
+          <tr><th>Government</th><td>Liberty, property, rights only</td><td>Education, labor laws, inheritance limits</td></tr>
+          <tr><th>Legacy</th><td>Austrian and Chicago schools</td><td>Marshallian neoclassical economics</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="sec">
+    <header>
+      <span class="eyebrow">Context</span>
+      <h2>The socialists Bastiat was answering</h2>
+    </header>
+    <div class="who-grid">
+      <div class="who"><b>Babeuf</b><span>1760–1797. Nature made people equal; commerce makes "lakes of gold for the few." Executed after a failed plot.</span></div>
+      <div class="who"><b>Saint-Simon</b><span>1760–1825. Attacked the idle rich and selfish competition; wanted planned cooperative production.</span></div>
+      <div class="who"><b>Fourier</b><span>Workers' cooperatives called phalanxes. Warned competition ends in monopoly.</span></div>
+      <div class="who"><b>Proudhon</b><span>1809–1865. "Property is theft." Bastiat's most despised opponent.</span></div>
+    </div>
+  </section>
+  <p class="foot">Based on Hunt &amp; Lautzenheiser, <i>History of Economic Thought: A Critical Perspective</i> (2011), ch. 8. ECO 4343 study aid.</p>
+</main>
+
+<!-- FLASHCARDS -->
+<main id="view-cards" class="wrap" hidden>
+  <section class="sec" style="border-bottom:0">
+    <header>
+      <span class="eyebrow">Flashcards</span>
+      <h2>Key terms</h2>
+      <p>Click the card or press Space to flip. Arrow keys move between cards.</p>
+    </header>
+    <div class="fc-tools" id="fc-filter"></div>
+    <div class="flash" id="flash">
+      <div class="inner">
+        <div class="face front"><span class="eyebrow" id="fc-tag"></span><div class="term" id="fc-term"></div></div>
+        <div class="face back"><span class="eyebrow" id="fc-tag2"></span><div class="def" id="fc-def"></div></div>
+      </div>
+    </div>
+    <div class="fc-nav">
+      <button class="btn" id="fc-prev">← Prev</button>
+      <span class="mono" id="fc-count"></span>
+      <button class="btn" id="fc-next">Next →</button>
+      <button class="btn" id="fc-shuffle">Shuffle</button>
+    </div>
+  </section>
+</main>
+
+<!-- PLAY -->
+<main id="view-play" class="wrap" hidden>
+  <div class="play">
+    <aside class="ledger">
+      <h3>The Ledger</h3>
+      <div id="ledger-rows"></div>
+      <div class="meta" id="ledger-meta"></div>
+    </aside>
+    <div class="table" id="table"></div>
+  </div>
+</main>
+
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+const COLORS = ["var(--bastiat)","var(--mill)","var(--gold)","var(--hunt)"];
+const DECKS = [
+  {id:"bastiat", name:"Bastiat", blurb:"Harmony, service, and sacred property", c:"var(--d-bastiat)"},
+  {id:"mill", name:"Mill", blurb:"Distribution, wages, and reform", c:"var(--d-mill)"},
+  {id:"hunt", name:"Hunt's Critique", blurb:"Where each one breaks down", c:"var(--d-hunt)"},
+  {id:"who", name:"Who Said It?", blurb:"Match the line to the thinker", c:"var(--d-who)"},
+  {id:"ctx", name:"Context", blurb:"Socialists and links to other chapters", c:"var(--d-ctx)"}
+];
+// Each question: q, o (first option is correct; shuffled when drawn), why, p.
+const BANK = {
+bastiat:[
+ {q:"What was the title of Bastiat's most important book?", o:["Economic Harmonies","Principles of Political Economy","What Is Property?","The Wealth of Nations"], why:"Economic Harmonies (1850). The title itself shows his goal: refuting the idea that class conflict is built into capitalism.", p:"p. 177"},
+ {q:"Bastiat said socialism proceeds by imagination, like which fields?", o:["Astrology and alchemy","Astronomy and chemistry","Physics and mathematics","Poetry and music"], why:"He claimed political economy observes, like astronomy and chemistry, while socialism imagines, like astrology and alchemy.", p:"p. 177"},
+ {q:"Bastiat declared that exchange is…", o:["Political economy itself, and society itself","Only a small part of economics","The source of class conflict","A tool of the state"], why:"\"Exchange is political economy… it is society itself.\" Smith had given exchange only a few dozen of nearly 1,000 pages.", p:"p. 178"},
+ {q:"In Bastiat's terms, what is \"onerous utility\"?", o:["Utility that requires human effort, like diamonds","A free gift of nature, like water","The utility of money","Utility provided by government"], why:"Gratuitous utility (water) is given free by Providence and is never priced. Onerous utility requires effort or pain and is priced. This was his answer to the water–diamond paradox.", p:"p. 179"},
+ {q:"How did Bastiat define a \"service\"?", o:["Effort by one person, while the want and satisfaction are another's","Any good sold in a market","Only the labor of wage workers","Spending by the government"], why:"Service = productive effort, which he defined as painful. Labor is just one kind of service; landlords and capitalists provide services too.", p:"p. 179"},
+ {q:"Which way did Bastiat say value flows?", o:["From the service to the material object","From the material object to the service","From labor time to price","From gold to goods"], why:"\"Value is not transmitted from the material object to the service, but from the service to the material.\" This reversed the direction later neoclassical theory used.", p:"p. 180"},
+ {q:"Finish Bastiat's line: \"Property does not exist because there are laws, but…\"", o:["laws exist because there is property","property creates the state","laws protect only the poor","property is theft"], why:"For Bastiat, property was a natural law created by God that comes before any human law.", p:"p. 181"},
+ {q:"Bastiat said capital has its roots in which three human attributes?", o:["Foresight, intelligence, and thrift","Labor, land, and money","Luck, inheritance, and force","Courage, faith, and charity"], why:"Saving capital meant sacrificing the present and controlling one's appetites for future generations.", p:"p. 182"},
+ {q:"According to Bastiat, what do landlords charge rent for?", o:["Only the improvements they made to the land","The land's original, natural powers","The right to vote","Nothing; rent should be abolished"], why:"Nature's contribution is free; rent pays for clearing, draining, enclosing, and improving. So land is just capital that can't move.", p:"p. 183"},
+ {q:"How did Bastiat defend inheritance?", o:["Fathers love their children, so banning bequests would paralyze half of human effort","Inheritance raises tax revenue","Inheritance is required by the labor theory of value","He opposed inheritance"], why:"Hunt points out this defense rests on love, not self-interest, which cuts against Bastiat's own theory.", p:"p. 183"},
+ {q:"What should government do, according to Bastiat?", o:["Only maintain liberty, property, and individual rights","Regulate monopolies and fund schools","Own the means of production","Set wages and prices"], why:"He saw government as the main barrier to competition and wanted it limited to protecting property and the right to exchange.", p:"p. 184"},
+ {q:"What did Bastiat's distribution \"law\" claim happens to workers as capital grows?", o:["Their share rises both relatively and absolutely","Their share falls","Their wages stay at subsistence","They become capitalists"], why:"He said capitalists' absolute share rises but their relative share falls, while workers gain on both counts, so their interests are harmonious.", p:"p. 185"},
+ {q:"Bastiat's one-word answer to all social ills was…", o:["Freedom","Revolution","Education","Charity"], why:"\"Men's interests are harmonious; therefore, the answer lies entirely in this one word: freedom.\"", p:"p. 185"}
+],
+mill:[
+ {q:"Mill claimed to be a disciple of which two thinkers?", o:["Bentham and Ricardo","Smith and Malthus","Say and Senior","Marx and Proudhon"], why:"He claimed both, but qualified each so heavily that Hunt says he was finally neither a utilitarian nor a labor theorist.", p:"p. 185"},
+ {q:"How did Mill contrast the laws of production and distribution?", o:["Production follows fixed natural laws; distribution is partly a human institution","Both are fixed by nature","Both are set by government","Distribution is fixed; production is a choice"], why:"Because distribution depends on laws and customs, Mill believed it had changed before and could change again.", p:"p. 186"},
+ {q:"For Mill, private property was justified…", o:["Only by general expediency; when not expedient, it is unjust","By God's natural law","By the labor theory of value","Never"], why:"Unlike Bastiat, Mill did not think property was sacred. It was a human convention to be judged by its effects.", p:"p. 186"},
+ {q:"Mill compared exchange to \"roads and carriages.\" What did he mean?", o:["Exchange is machinery for distribution, not its fundamental law","Exchange is the core of economics","Trade needs better infrastructure","Exchange is like travel: optional"], why:"Mill refused to make exchange the heart of political economy, a sharp break from Bastiat.", p:"pp. 186–187"},
+ {q:"What value theory did Mill finally rely on?", o:["Smith's adding-up cost of production (wages + profit + rent)","A pure labor theory of value","Marginal utility","The quantity theory of money"], why:"He said labor theory works only when capital/labor ratios are equal. Since they aren't (wine vs. cloth), he reverted to Smith's adding-up theory.", p:"pp. 188–189"},
+ {q:"Mill borrowed which phrase from Senior to describe profits?", o:["The remuneration of abstinence","The produce of labor","Rent of ability","Unearned increment"], why:"Profit as a reward for abstinence, risk, and supervision dominated Mill's Principles, even though he sometimes described profit Ricardo's way.", p:"p. 189"},
+ {q:"What was Mill's major original contribution to trade theory?", o:["Offer curves: international prices settle where two countries' curves cross","Comparative advantage","Mercantilism","The gold standard"], why:"Ricardo showed comparative advantage but not how the international price was set. Mill used balanced payments and supply and demand. It's still the orthodox theory.", p:"p. 190"},
+ {q:"What happened to Mill's view of the wages fund doctrine in 1869?", o:["He recanted: wages are set by struggle, limited by profits minus capitalists' needs","He made it stricter","He first adopted it","He replaced it with Say's Law"], why:"In a review of Thornton's book, Mill said higher wages come out of the capitalist's income, so unions and strikes can redistribute income.", p:"pp. 191–192"},
+ {q:"How did Mill think workers' wages could best be raised?", o:["Education leading to smaller families, including birth control","Higher tariffs","Abolishing the Poor Law","Lowering the interest rate"], why:"Unlike Malthus, Mill did not consider birth control a vice.", p:"p. 191"},
+ {q:"Which two forces did Mill say counteract the falling rate of profit?", o:["Export of capital and commercial crises","Higher wages and more unions","Tariffs and taxes","Population growth and rent"], why:"Sending capital to colonies keeps profits up at home, and crises destroy excess capital.", p:"p. 192"},
+ {q:"How did Mill treat Say's Law?", o:["He defended it, calling a glut an \"undersupply of money\"","He rejected it like Malthus","He never discussed it","He invented it"], why:"Even though he described boom-and-bust cycles clearly, he called crises temporary. Keynes: \"In the long run we are all dead.\"", p:"p. 193"},
+ {q:"Mill said a socialist society was at present workable only by…", o:["The elite of mankind","The working class","The French","The government"], why:"Until people's characters improved, he thought the \"struggle for riches\" was the best available stimulus: coarse minds need coarse stimuli.", p:"p. 195"},
+ {q:"What was Mill's main reform for reducing extremes of wealth?", o:["Limiting what anyone can receive by inheritance or gift","Abolishing private property","A flat tax on wages","Ending the Poor Law"], why:"Bequest is a privilege of property that can be regulated for the general good.", p:"p. 197"},
+ {q:"What did Mill want done about natural monopolies?", o:["Regulate them, or let the public collect the monopoly profits","Leave them alone","Break them into many small firms","Give them tax breaks"], why:"Where a monopoly can't be prevented, the community needs security beyond the managers' self-interest.", p:"p. 198"}
+],
+hunt:[
+ {q:"What is Hunt's main inconsistency charge against Bastiat's idea of service?", o:["Service is defined as pain, yet lending money or letting land be used counts as service","Bastiat ignored money","Bastiat used too much math","Bastiat agreed with the socialists"], why:"How does owning money and collecting interest hurt? The capitalist's \"pain\" is just not leaving the factory idle.", p:"pp. 180–182"},
+ {q:"Why does Hunt focus on a thinker's inconsistencies?", o:["Class bias is often more consistent than the thinker's logic","Inconsistencies show genius","They are printing errors","They prove the thinker was a socialist"], why:"When logic and class interest conflict, the logic tends to give way, revealing the bias.", p:"p. 180"},
+ {q:"According to Hunt, where did most capitalist fortunes actually come from?", o:["Fraud, coercion, and conquest, and then inheritance","Saving out of wages","Lottery wins","Government grants to the poor"], why:"A worker earning subsistence cannot save the millions needed to become a capitalist.", p:"p. 182"},
+ {q:"Hunt asks who actually drained and improved the fields. His answer?", o:["Peasants and wage workers, who paid rent to absentee landlords","The landlords themselves","The government","Nobody; land was never improved"], why:"Bastiat claimed to observe facts, but wealthy landlords in Paris mansions weren't out draining fields.", p:"p. 183"},
+ {q:"Which exchange did Bastiat ignore, according to Hunt?", o:["Capitalists trading bribes to politicians for monopoly laws","Workers trading labor for wages","Countries trading wine for cloth","Banks trading gold"], why:"By Bastiat's own logic both sides gain, but the public suffers. This breaks the harmony story.", p:"p. 184"},
+ {q:"What logical error did Hunt find in Bastiat's distribution law?", o:["A falling profit rate doesn't mean a falling profit share","Capital never grows","Wages always fall","Interest rates never fall"], why:"If capital grows by a bigger percentage than the rate falls, capital's share rises and labor's falls.", p:"p. 185"},
+ {q:"Which syllogism does Hunt say sums up utilitarian economics?", o:["All exchanges benefit all; all interactions are exchanges; so all interactions benefit all","Labor creates value; workers get wages; so wages equal value","Supply creates demand; demand creates supply; so there are no gluts","Property is theft; the state protects property; so the state is a thief"], why:"Once every human interaction is reduced to exchange, harmony follows automatically.", p:"p. 178"},
+ {q:"Which two axioms of Benthamite utilitarianism did Mill break?", o:["All motives are self-interest; and each person is the sole judge of pleasure","Labor creates value; and rent is unearned","Supply creates demand; and money is neutral","Population outruns food; and wages fall"], why:"Mill hoped for \"nobler\" motives and ranked some pleasures above others. Hunt agrees with Mill here.", p:"p. 187"},
+ {q:"What does Hunt's misanthrope example show?", o:["Utilitarian social ethics requires unanimity","Most people are selfish","Socialism can't work","Wages fund theory is correct"], why:"If one person enjoys others' pain and pushpin is as good as poetry, there's no way to rank the philanthropist above the misanthrope.", p:"p. 198"},
+ {q:"Why can't a consistent utilitarian expect government reform?", o:["Self-interested politicians will sell laws to the rich, since money is power","Governments are too small","Reform is unconstitutional","Voters don't care"], why:"Money is the lifeblood of politics in capitalism, so the most mutually beneficial exchange is between politicians and the wealthy.", p:"p. 199"},
+ {q:"What inconsistency does Hunt find in Mill's plan to end poverty?", o:["If spare capital is always available, profit can't be needed to reward abstinence","Mill wanted to raise taxes on the poor","Mill opposed education","Mill wanted to abolish colonies"], why:"Hunt sees this as a clue to class orientation: a humanitarian who still didn't fully drop the justification for profit.", p:"p. 197"},
+ {q:"Hunt says Mill's hope for reform was…", o:["Improbable rather than impossible","Impossible","Guaranteed","Already achieved"], why:"By rejecting utilitarianism, Mill could hope for a public-spirited politician. But in capitalism money is power and power begets money.", p:"p. 199"},
+ {q:"Bastiat and Mill were precursors of which schools?", o:["Bastiat: Austrian and Chicago. Mill: Marshallian.","Bastiat: Marxist. Mill: Austrian.","Both: Keynesian","Bastiat: Marshallian. Mill: Chicago."], why:"Bastiat led toward rigid laissez-faire conservatism, Mill toward moderate neoclassical reform.", p:"p. 186"}
+],
+who:[
+ {q:"\"Property is theft.\"", o:["Proudhon","Bastiat","Mill","Fourier"], why:"From What Is Property? Proudhon was Bastiat's most despised opponent.", p:"p. 176"},
+ {q:"\"Exchange is political economy.\"", o:["Bastiat","Mill","Ricardo","Proudhon"], why:"Bastiat reduced all economics to exchange. Mill explicitly rejected this.", p:"p. 178"},
+ {q:"\"Better to be a Socrates dissatisfied than a fool satisfied.\"", o:["Mill","Bentham","Bastiat","Hunt"], why:"Mill's claim that some pleasures are higher than others, which breaks with Bentham.", p:"p. 187"},
+ {q:"\"Desire runs ahead, while the means limp along behind.\"", o:["Bastiat","Mill","Malthus","Fourier"], why:"Bastiat's version of unlimited wants and limited means.", p:"p. 179"},
+ {q:"Quantity of pleasure being equal, pushpin is as good as poetry.", o:["Bentham","Mill","Bastiat","Proudhon"], why:"Bentham's view that no kind of pleasure is better than another. Mill rejected it.", p:"p. 187"},
+ {q:"\"In the long run we are all dead.\"", o:["Keynes","Mill","Bastiat","Marx"], why:"Keynes's reply to defenders of Say's Law, like Mill, who said crises are only temporary.", p:"p. 193"},
+ {q:"Dividing the human race into two hereditary classes, employers and employed, can't be permanently maintained.", o:["Mill","Bastiat","Proudhon","Babeuf"], why:"Mill believed the class structure of his time would eventually be replaced.", p:"p. 194"},
+ {q:"Commerce exists to pump everybody's sweat and blood into \"lakes of gold for the few.\"", o:["Babeuf","Saint-Simon","Mill","Bastiat"], why:"Babeuf, the French revolutionary executed after his plot failed.", p:"p. 175"},
+ {q:"\"While minds are coarse they require coarse stimuli.\"", o:["Mill","Bastiat","Bentham","Fourier"], why:"Mill's reason for tolerating the \"struggle for riches\" until people's characters improve.", p:"p. 195"},
+ {q:"Competition carried to extremes approaches \"universal monopoly.\"", o:["Fourier","Bastiat","Mill","Say"], why:"Fourier was one of the first socialists to predict that competition leads to monopoly.", p:"p. 176"},
+ {q:"\"Every exchange represents two gains for humanity.\"", o:["Condillac (quoted by Bastiat)","Proudhon","Mill","Ricardo"], why:"Bastiat quoted Condillac approvingly to argue exchange always benefits both sides.", p:"pp. 177–178"},
+ {q:"Profits are \"the remuneration of abstinence.\"", o:["Senior (adopted by Mill)","Ricardo","Bastiat","Proudhon"], why:"Mill called it Senior's \"well-chosen expression\" and made it central to his Principles.", p:"p. 189"},
+ {q:"\"Laws exist because there is property.\"", o:["Bastiat","Mill","Proudhon","Hodgskin"], why:"Bastiat's claim that property is natural and comes before human law.", p:"p. 181"}
+],
+ctx:[
+ {q:"What did Fourier call his voluntary workers' cooperatives?", o:["Phalanxes","Communes","Guilds","Soviets"], why:"Fourier thought only about a third of people did useful work under capitalism.", p:"p. 176"},
+ {q:"Where did socialism grow fastest in the 1830s and 1840s?", o:["France","England","The United States","Germany"], why:"Its economic ideas came mostly from England, but French socialism spread fastest, which is the context Bastiat wrote in.", p:"p. 175"},
+ {q:"What did Saint-Simon condemn?", o:["The idle rich and selfish competition","All government","Industrial machinery","Cooperation"], why:"He wanted planned cooperative production with heavy government involvement.", p:"p. 175"},
+ {q:"What happened to Gracchus Babeuf?", o:["He was executed after a failed plot for equality","He became prime minister","He wrote Economic Harmonies","He moved to England"], why:"After the fall of Robespierre, Babeuf plotted to topple the government. The plot was betrayed.", p:"p. 175"},
+ {q:"How had Ricardo defined political economy?", o:["The laws regulating distribution among the three great classes","The study of exchange","The study of money","The study of population"], why:"This shows how far Bastiat moved from the classical economists by making exchange everything.", p:"p. 178"},
+ {q:"Mill's argument about exporting capital resembles the later ideas of…", o:["Marx and Lenin on imperialism","Bastiat and Say","Bentham and Senior","Keynes and Friedman"], why:"Sending capital abroad keeps profit rates up at home and brings back cheap food and materials.", p:"p. 192"},
+ {q:"Mill backed poor relief based on which principle?", o:["The 1834 Poor Law: available to all, but with a strong motive to do without it","Unconditional basic income","No relief at all","Relief only through churches"], why:"This was Senior's philosophy, covered in chapter 6.", p:"p. 197"},
+ {q:"Why did Mill support limits on working hours?", o:["A single worker has no power to bargain for shorter hours alone","Long hours lower profits","The Bible forbids it","Machines need rest"], why:"As long as any worker can be replaced, no individual can win shorter hours, even if all of society would benefit.", p:"p. 197"},
+ {q:"Why do international prices depend on supply and demand rather than cost, for Mill?", o:["Labor and capital can't move freely between countries","Countries use different money","Tariffs set all prices","Transport costs are zero"], why:"Within one country competition equalizes profit rates and forces price to equal cost. Between countries it can't.", p:"p. 190"},
+ {q:"When did Mill say the labor theory of value would hold exactly?", o:["Only when capital/labor ratios are equal in all industries","Always","Never, under any condition","Only in agriculture"], why:"Wine aged longer than cloth must earn profit over a longer period, so equal labor gives different values.", p:"p. 188"},
+ {q:"In Hunt's closing, what does he say the rich have seldom been since 1848?", o:["\"Content with being rich\"","Taxed","Politically active","Wealthy"], why:"Mill hoped the rich would become content and give up political privileges. Hunt says that hasn't happened.", p:"p. 200"},
+ {q:"Which chapter's ideas did Mill borrow for the abstinence theory and the wages fund?", o:["Chapter 6: Senior","Chapter 4: Malthus","Chapter 9: Marx","Chapter 7: Hodgskin"], why:"Mill took Senior's abstinence theory of profit and wages fund doctrine, though he later dropped the wages fund.", p:"pp. 189–191"}
+]};
+
+const TERMS = [
+ ["Pure utilitarianism","Applying Bentham's pleasure and self-interest principle consistently to all of economics. Bastiat is the example.","Bastiat"],
+ ["Eclectic","Mixing ideas from different sources, often inconsistently. Hunt's label for Mill.","Mill"],
+ ["Economic Harmonies","Bastiat's 1850 book arguing all class interests agree under laissez-faire.","Bastiat"],
+ ["Gratuitous utility","Usefulness given free by nature, like water. Never priced.","Bastiat"],
+ ["Onerous utility","Usefulness that requires human effort or pain, like diamonds. This is what gets priced.","Bastiat"],
+ ["Service (Bastiat)","Productive effort by one person to satisfy another's want. Defined as pain. Labor is only one kind.","Bastiat"],
+ ["Utilitarian syllogism","All exchanges benefit all parties; all interactions are exchanges; so all interactions benefit all parties.","Hunt"],
+ ["Unanimity requirement","Utilitarianism can only call a change better if no one is made worse off, because pleasures can't be compared between people.","Hunt"],
+ ["Rate vs. share","A falling profit rate doesn't mean a falling profit share. Hunt's rebuttal of Bastiat's distribution law.","Hunt"],
+ ["Laws of production vs. distribution","Mill: production follows nature; distribution is a human institution that can change.","Mill"],
+ ["General expediency","Mill's test for property: keep a property right only if it serves the general good.","Mill"],
+ ["Pushpin vs. poetry","Bentham: equal pleasure means equal value. Mill: some pleasures are higher.","Mill"],
+ ["Adding-up cost of production","Natural price = wages + profit + rent. Smith's theory, revived by Mill.","Mill"],
+ ["Remuneration of abstinence","Senior's phrase for profit, adopted by Mill.","Mill"],
+ ["Offer curve","The exports and imports a country will trade at each price while balancing payments. Equilibrium is where two curves cross.","Mill"],
+ ["Wages fund doctrine","Wages = fund set aside for labor ÷ number of workers. Mill accepted it in 1848 and recanted in 1869.","Mill"],
+ ["Export of capital","Sending capital abroad to keep domestic profit rates up. Mill's idea, later developed by Marx and Lenin.","Mill"],
+ ["Commercial crisis","A periodic bust after over-trading and speculation that destroys capital and leaves people impoverished.","Mill"],
+ ["Say's Law","Supply creates its own demand, so there's no general glut. Mill defended it despite describing crises.","Mill"],
+ ["Natural monopoly","An industry that can't be competitive. Mill wanted it regulated or its profits taken by the public.","Mill"],
+ ["\"Property is theft\"","Proudhon's slogan. Property is the \"mother of tyranny.\"","Context"],
+ ["Phalanxes","Fourier's voluntary workers' cooperatives.","Context"]
+];
+
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c]));
+const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const store = {get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+function toast(msg){const t=$("#toast");t.textContent=msg;t.classList.add("show");clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove("show"),2200)}
+
+/* Tabs */
+function showView(v){
+  document.querySelectorAll("nav.tabs button").forEach(b=>b.setAttribute("aria-selected", b.dataset.view===v));
+  ["study","cards","play"].forEach(x=>$("#view-"+x).hidden = x!==v);
+  store.set("pp-view", v);
+  window.scrollTo(0,0);
+}
+document.querySelectorAll("nav.tabs button").forEach(b=>b.onclick=()=>showView(b.dataset.view));
+
+/* Lab */
+function lab(){
+  const g=+$("#lab-k").value, r=+$("#lab-r").value, y=+$("#lab-y").value;
+  $("#o-k").textContent=g+"%"; $("#o-r").textContent=r+"%"; $("#o-y").textContent=y+"%";
+  const K0=300, r0=10, Y0=100, P0=K0*r0/100, W0=Y0-P0;
+  const K1=K0*(1+g/100), Y1=Y0*(1+y/100);
+  const P1=Math.min(K1*r/100, Y1), W1=Y1-P1;
+  const s0=P0/Y0*100, s1=P1/Y1*100;
+  const max=Math.max(Y0,Y1);
+  const bar=(P,W,Y)=>`<div class="k" style="width:${P/max*100}%">${P.toFixed(0)}</div><div class="w" style="width:${W/max*100}%">${W.toFixed(0)}</div>`;
+  $("#bar-a").innerHTML=bar(P0,W0,Y0); $("#bar-b").innerHTML=bar(P1,W1,Y1);
+  const holds = s1<s0 && W1>W0;
+  const v=$("#verdict");
+  v.className="verdict "+(holds?"ok":"no");
+  v.innerHTML = `<b>${holds?"Bastiat's law holds here":"Bastiat's law fails here"}</b><br>Capital's share went from <span class="mono">${s0.toFixed(0)}%</span> to <span class="mono">${s1.toFixed(0)}%</span>; labor's from <span class="mono">${(100-s0).toFixed(0)}%</span> to <span class="mono">${(100-s1).toFixed(0)}%</span>. `
+    + (holds ? "Output grew fast enough that the lower rate really did shrink capital's slice." : "The rate fell, but capital grew so much that capitalists took a bigger slice anyway. That's Hunt's point: a lower rate is not a lower share.")
+    + `<br><span style="font-size:.8rem;color:var(--ink-soft)">Blue = profit to capital, green = wages to labor.</span>`;
+}
+["#lab-k","#lab-r","#lab-y"].forEach(s=>$(s).addEventListener("input",lab));
+lab();
+
+/* Flashcards */
+const FC = {filter:"All", order:TERMS.map((_,i)=>i), i:0};
+function fcList(){ return FC.order.filter(i=>FC.filter==="All"||TERMS[i][2]===FC.filter); }
+function fcRender(){
+  const list=fcList(); if(FC.i>=list.length) FC.i=0;
+  const t=TERMS[list[FC.i]];
+  $("#flash").classList.remove("flipped");
+  $("#fc-term").textContent=t[0]; $("#fc-def").textContent=t[1];
+  $("#fc-tag").textContent=t[2]; $("#fc-tag2").textContent=t[2]+" · definition";
+  $("#fc-count").textContent=(FC.i+1)+" / "+list.length;
+}
+$("#fc-filter").innerHTML=["All","Bastiat","Mill","Hunt","Context"].map(f=>`<button class="chip" aria-pressed="${f==="All"}" data-f="${f}">${f}</button>`).join("");
+$("#fc-filter").onclick=e=>{const b=e.target.closest("button");if(!b)return;FC.filter=b.dataset.f;FC.i=0;document.querySelectorAll("#fc-filter .chip").forEach(c=>c.setAttribute("aria-pressed",c===b));fcRender()};
+$("#flash").onclick=()=>$("#flash").classList.toggle("flipped");
+$("#fc-next").onclick=()=>{FC.i=(FC.i+1)%fcList().length;fcRender()};
+$("#fc-prev").onclick=()=>{const n=fcList().length;FC.i=(FC.i-1+n)%n;fcRender()};
+$("#fc-shuffle").onclick=()=>{FC.order=shuffle(FC.order);FC.i=0;fcRender();toast("Shuffled")};
+document.addEventListener("keydown",e=>{
+  if($("#view-cards").hidden||e.target.matches("input,textarea"))return;
+  if(e.key===" "){e.preventDefault();$("#flash").classList.toggle("flipped")}
+  if(e.key==="ArrowRight")$("#fc-next").click();
+  if(e.key==="ArrowLeft")$("#fc-prev").click();
+});
+fcRender();
+
+/* Game
+   Each turn: pick a deck, then wager Pushpin (+100, safe) or Poetry (+250 / -100).
+   After every full round there's a chance of a Commercial Crisis that destroys 20% of the leader's capital. */
+const PUSHPIN=100, POETRY_WIN=250, POETRY_LOSS=100;
+let G = null;
+const blankGame = () => ({phase:"setup", names:store.get("pp-names",["Player 1","Player 2"]), rounds:5});
+
+function newGame(names, rounds){
+  const piles={}; DECKS.forEach(d=>piles[d.id]=shuffle(BANK[d.id].map((_,i)=>i)));
+  G={phase:"deck", players:names.map((n,i)=>({name:n, score:0, right:0, total:0, color:COLORS[i]})), rounds, round:1, turn:0, piles, q:null, wager:null, missed:[], event:null};
+}
+function cur(){ return G.players[G.turn]; }
+
+function renderLedger(){
+  const rows=$("#ledger-rows"), meta=$("#ledger-meta");
+  if(!G||G.phase==="setup"){
+    rows.innerHTML=`<div class="prow"><span></span><span class="nm" style="color:var(--ink-soft);font-weight:500">Scores appear once a game starts.</span><span></span></div>`;
+    meta.innerHTML=`<span>Pushpin: +${PUSHPIN}</span><span>Poetry: +${POETRY_WIN} / −${POETRY_LOSS}</span>`;
+    return;
+  }
+  rows.innerHTML=G.players.map((p,i)=>`<div class="prow ${i===G.turn&&G.phase!=="over"?"now":""}"><span class="dot" style="background:${p.color}"></span><span class="nm">${esc(p.name)}<small>${p.right}/${p.total} correct</small></span><span class="sc">${p.score}</span></div>`).join("");
+  meta.innerHTML=G.phase==="over"?`<span>Game over</span>`:`<span>Round <b class="mono">${G.round}</b> of ${G.rounds}</span><span>Pushpin +${PUSHPIN} · Poetry +${POETRY_WIN} / −${POETRY_LOSS}</span>`;
+}
+
+function render(){
+  renderLedger();
+  const T=$("#table");
+  if(!G||G.phase==="setup"){ T.innerHTML=setupHTML(); bindSetup(); return; }
+  const p=cur();
+  if(G.phase==="deck"){
+    T.innerHTML=`<div class="panel">
+      <div class="qhead"><h2 style="color:${p.color}">${esc(p.name)}, pick a deck</h2><span class="eyebrow">Round ${G.round} of ${G.rounds}</span></div>
+      <p style="color:var(--ink-soft)">Pass the device to ${esc(p.name)}. Choose which topic to draw from.</p>
+      <div class="decks">${DECKS.map(d=>`<button class="deck" style="--c:${d.c}" data-d="${d.id}"><b>${d.name}</b><span>${d.blurb}</span><small>${G.piles[d.id].length} cards left</small></button>`).join("")}</div>
+    </div>`;
+    T.querySelectorAll(".deck").forEach(b=>b.onclick=()=>{draw(b.dataset.d)});
+  }
+  else if(G.phase==="wager"){
+    const d=DECKS.find(x=>x.id===G.q.deck);
+    T.innerHTML=`<div class="panel">
+      <div class="qhead"><h2 style="color:${p.color}">Pushpin or poetry?</h2><span class="pill" style="--c:${d.c}">${d.name}</span></div>
+      <p style="color:var(--ink-soft)">Bentham said that if the pleasure is equal, the simple game of pushpin is as good as poetry. Mill said some pleasures are higher. Pick your stakes before you see the question.</p>
+      <div class="wager">
+        <button id="w-push"><b>Pushpin</b><span class="pts">+${PUSHPIN} if right · 0 if wrong</span><span>The safe, simple pleasure. Bentham would approve.</span></button>
+        <button id="w-poet"><b>Poetry</b><span class="pts">+${POETRY_WIN} if right · −${POETRY_LOSS} if wrong</span><span>The higher pleasure. Better a Socrates dissatisfied…</span></button>
+      </div>
+    </div>`;
+    $("#w-push").onclick=()=>{G.wager="pushpin";G.phase="question";render()};
+    $("#w-poet").onclick=()=>{G.wager="poetry";G.phase="question";render()};
+  }
+  else if(G.phase==="question"||G.phase==="answered"){
+    const d=DECKS.find(x=>x.id===G.q.deck), q=G.q.data, done=G.phase==="answered";
+    const isWho=G.q.deck==="who";
+    T.innerHTML=`<div class="panel">
+      <div class="qhead"><span class="pill" style="--c:${d.c}">${d.name}</span><span class="eyebrow">${esc(p.name)} · ${G.wager==="poetry"?"Poetry":"Pushpin"}</span></div>
+      ${isWho?`<span class="eyebrow">Who said it?</span><div class="qtext" style="font-style:italic">${esc(q.q)}</div>`:`<div class="qtext">${esc(q.q)}</div>`}
+      <div class="opts">${G.q.opts.map((o,i)=>{
+        let cls=""; if(done){ if(o===q.o[0]) cls="right"; else if(i===G.q.pick) cls="wrong"; }
+        return `<button class="opt ${cls}" data-i="${i}" ${done?"disabled":""}><span class="k">${"ABCD"[i]}</span><span>${esc(o)}</span></button>`}).join("")}</div>
+      ${done?`<div class="why ${G.q.correct?"yes":"no"}"><b>${G.q.correct?"Correct":"Not quite"} · ${G.q.delta>0?"+":""}${G.q.delta}</b><span>${esc(q.why)}</span><span class="mono" style="font-size:.78rem;color:var(--ink-soft)">Hunt, ${esc(q.p)}</span></div>
+      <div><button class="btn primary" id="next">${nextLabel()}</button></div>`:""}
+    </div>`;
+    if(!done) T.querySelectorAll(".opt").forEach(b=>b.onclick=()=>answer(+b.dataset.i));
+    else $("#next").onclick=advance;
+  }
+  else if(G.phase==="event"){
+    const e=G.event;
+    T.innerHTML=`<div class="event">
+      <span class="eyebrow">End of round ${G.round-1} · Mill's business cycle</span>
+      <b>Commercial crisis!</b>
+      <p>Over-trading and rash speculation have built more factories than the market can use. As Mill wrote, crises destroy capital. The leader, <b style="font-size:1rem;color:var(--ink)">${esc(e.name)}</b>, loses 20% of their points: <span class="mono">−${e.loss}</span>.</p>
+      <p style="font-size:.88rem;color:var(--ink-soft)">Mill still defended Say's Law, calling this a temporary "undersupply of money." Keynes: "In the long run we are all dead."</p>
+      <div><button class="btn primary" id="next">Continue to round ${G.round}</button></div>
+    </div>`;
+    $("#next").onclick=()=>{G.phase="deck";render()};
+  }
+  else if(G.phase==="over"){
+    const ranked=G.players.slice().sort((a,b)=>b.score-a.score);
+    const top=ranked[0], tie=ranked.filter(p=>p.score===top.score).length>1;
+    T.innerHTML=`<div class="panel">
+      <span class="eyebrow">Final ledger</span>
+      <h2>${tie?"A harmony of interests: it's a tie!":esc(top.name)+" wins"}</h2>
+      <p style="color:var(--ink-soft)">${tie?"Bastiat would be pleased. Mill would want to know how it was distributed.":"Mill would remind you that distribution is a human institution."}</p>
+      <div class="podium">${ranked.map((p,i)=>`<div class="prow"><span class="dot" style="background:${p.color}"></span><span class="nm">${i+1}. ${esc(p.name)}<small>${p.right}/${p.total} correct</small></span><span class="sc">${p.score}</span></div>`).join("")}</div>
+      ${G.missed.length?`<h3>Review what you missed</h3><div class="missed">${G.missed.map(m=>`<div>${esc(m.q)}<em>Answer: ${esc(m.a)} (Hunt, ${esc(m.p)})</em></div>`).join("")}</div>`:`<p>No misses this game.</p>`}
+      <div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn primary" id="again">Play again</button><button class="btn" id="setup">New players</button></div>
+    </div>`;
+    $("#again").onclick=()=>{newGame(G.players.map(p=>p.name),G.rounds);render()};
+    $("#setup").onclick=()=>{G=blankGame();render()};
+  }
+}
+function nextLabel(){
+  const lastTurn=G.turn===G.players.length-1;
+  if(lastTurn&&G.round>=G.rounds) return "See final scores";
+  return "Next: "+esc(G.players[(G.turn+1)%G.players.length].name);
+}
+
+function setupHTML(){
+  const g=G||blankGame();
+  return `<div class="panel">
+    <span class="eyebrow">Pass-and-play · 2 to 4 players</span>
+    <h2>Set the table</h2>
+    <div class="rules">
+      <div class="rule"><b>1. Pick a deck</b>Bastiat, Mill, Hunt's critique, Who said it?, or Context.</div>
+      <div class="rule"><b>2. Pushpin or poetry</b>Bet safe (+${PUSHPIN}) or bet high (+${POETRY_WIN}, but −${POETRY_LOSS} if wrong).</div>
+      <div class="rule"><b>3. Watch for crises</b>After each round a commercial crisis may hit the leader for 20%.</div>
+    </div>
+    <div class="seg" id="count">${[2,3,4].map(n=>`<button class="chip" aria-pressed="${g.names.length===n}" data-n="${n}">${n} players</button>`).join("")}</div>
+    <div class="setup-rows" id="names">${g.names.map((n,i)=>`<div class="setup-row"><span class="dot" style="background:${COLORS[i]}"></span><input id="pname-${i}" maxlength="20" value="${esc(n)}" aria-label="Player ${i+1} name"></div>`).join("")}</div>
+    <div class="seg" id="rounds"><span class="eyebrow" style="align-self:center;margin-right:6px">Rounds</span>${[3,5,8].map(n=>`<button class="chip" aria-pressed="${g.rounds===n}" data-r="${n}">${n}</button>`).join("")}</div>
+    <div><button class="btn gold" id="start">Start game</button></div>
+  </div>`;
+}
+function bindSetup(){
+  if(!G) G=blankGame();
+  const readNames=()=>[...document.querySelectorAll("#names input")].map((x,i)=>x.value.trim()||("Player "+(i+1)));
+  $("#count").onclick=e=>{const b=e.target.closest("button");if(!b)return;const n=+b.dataset.n;const cur=readNames();G.names=Array.from({length:n},(_,i)=>cur[i]||("Player "+(i+1)));render()};
+  $("#rounds").onclick=e=>{const b=e.target.closest("button");if(!b)return;G.names=readNames();G.rounds=+b.dataset.r;render()};
+  $("#start").onclick=()=>{const names=readNames();store.set("pp-names",names);newGame(names,G.rounds);render();toast(names[0]+" goes first")};
+}
+
+function draw(deck){
+  if(!G.piles[deck].length) G.piles[deck]=shuffle(BANK[deck].map((_,i)=>i));
+  const idx=G.piles[deck].pop(), data=BANK[deck][idx];
+  G.q={deck, data, opts:shuffle(data.o), pick:null, correct:null, delta:0};
+  G.phase="wager"; render();
+}
+function answer(i){
+  const p=cur(), q=G.q, ok=q.opts[i]===q.data.o[0];
+  q.pick=i; q.correct=ok; p.total++;
+  if(ok){ p.right++; q.delta=G.wager==="poetry"?POETRY_WIN:PUSHPIN; }
+  else { q.delta=G.wager==="poetry"?-POETRY_LOSS:0; G.missed.push({q:q.data.q, a:q.data.o[0], p:q.data.p}); }
+  p.score+=q.delta;
+  G.phase="answered"; render();
+}
+function advance(){
+  G.turn++;
+  if(G.turn>=G.players.length){
+    G.turn=0;
+    if(G.round>=G.rounds){ G.phase="over"; render(); return; }
+    G.round++;
+    // 35% chance of a crisis after a round, only if someone is ahead
+    const lead=G.players.slice().sort((a,b)=>b.score-a.score);
+    if(lead[0].score>0 && lead[0].score>lead[1].score && Math.random()<.35){
+      const loss=Math.round(lead[0].score*.2/10)*10;
+      lead[0].score-=loss; G.event={name:lead[0].name, loss}; G.phase="event"; render(); return;
+    }
+  }
+  G.phase="deck"; render();
+}
+
+function start(saved){
+  if(saved&&saved.G) G=saved.G;
+  render();
+  if(saved&&saved.view) showView(saved.view); else showView(store.get("pp-view","study"));
+}
+window.claude?.hot?.snapshot?.(()=>({G, view:document.querySelector("nav.tabs button[aria-selected=true]")?.dataset.view}));
+window.claude?.hot?.ready ? window.claude.hot.ready(start) : start(window.claude?.hot?.data ?? {});
+</script>
+
+</body>
+
+</html>
